@@ -22,12 +22,11 @@ function App() {
 
 
   const addEmployee = () => {
-    Axios.post("https://localhost:3001/create", {
+    Axios.post("https://localhost:3001/employees/add", {
       name: name,
       salary: salary,
       position: position,
       email: email,
-      deptId: deptId,
       phoneNo: phoneNo
     }).then(() => {
       setEmployeeList([
@@ -37,7 +36,6 @@ function App() {
           salary: salary,
           position: position,
           email: email,
-          deptId: deptId,
           phoneNo: phoneNo
         },
       ]);
@@ -84,14 +82,6 @@ function App() {
           type="tel"
           onChange={(event) => {
             setPhoneNo(event.target.value);
-          }
-        }
-        />
-        <label>Dept ID:</label>
-        <input
-          type="number"
-          onChange={(event) => {
-            setDeptId(event.target.value);
           }
         }
         />

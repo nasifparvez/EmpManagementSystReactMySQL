@@ -2,9 +2,10 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mysql = require("mysql");
 const server = express();
-server.use(bodyParser.json());
+
 var cors = require('cors')
-app.use(cors())
+server.use(cors())
+server.use(bodyParser.json());
 
 let sql = `CALL filterTodo(?)`;
  
@@ -40,15 +41,15 @@ server.listen(3001,function check(error) {
 });
  
 //Create the Records
-server.post("/api/employee/add", (req, res) => {
+server.post("/employee/add", (req, res) => {
     let details = {
       name: req.body.name,
       phone: req.body.phone,
       email: req.body.email,
       salary: req.body.salary,
       title: req.body.title,
-      mngr_id: req.body.mngr_id,
-      empid:req.body.emp_id
+      // mngr_id: req.body.mngr_id,
+      // empid:req.body.emp_id
     };
       let sql = "INSERT INTO employee SET ?";
     db.query(sql, details, (error) => {
