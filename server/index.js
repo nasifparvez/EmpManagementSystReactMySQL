@@ -3,13 +3,17 @@ const bodyParser = require('body-parser')
 const mysql = require("mysql");
 const server = express();
 server.use(bodyParser.json());
+var cors = require('cors')
+app.use(cors())
+
+let sql = `CALL filterTodo(?)`;
  
  
 //Establish the database connection
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "",
+    password: "password",
     database: "empmanagementsyst",
 });
 
@@ -23,7 +27,7 @@ db.connect(function (error) {
 });
  
 //Establish the Port
-server.listen(8085,function check(error) {
+server.listen(3001,function check(error) {
     if (error)
     {
         console.log("Error");
@@ -31,7 +35,7 @@ server.listen(8085,function check(error) {
  
     else
     {
-        console.log("Started on 8085");
+        console.log("Started on 3001");
     }
 });
  
@@ -46,7 +50,7 @@ server.post("/api/employee/add", (req, res) => {
       mngr_id: req.body.mngr_id,
       empid:req.body.emp_id
     };
-    let sql = "INSERT INTO employee SET ?";
+      let sql = "INSERT INTO employee SET ?";
     db.query(sql, details, (error) => {
       if (error) {
         res.send({ status: false, message: "Employee created Failed" });
@@ -58,7 +62,7 @@ server.post("/api/employee/add", (req, res) => {
 
 
 //view the Records
-server.get("/api/employee", (req, res) => {
+server.get("/employee", (req, res) => {
     var sql = "SELECT * FROM Employee";
     db.query(sql, function (error, result) {
       if (error) {
