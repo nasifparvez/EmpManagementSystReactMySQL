@@ -8,40 +8,73 @@ function App() {
   const [phoneNo, setPhoneNo] = useState(0);
   const [salary, setSalary] = useState(0);
   const [email, setEmail] = useState("");
-  const [position, setPosition] = useState("");
-  const [deptId, setDeptId] = useState(0);
+  const [job_title, setjob_title] = useState("");
+
+  const [newSalary, setNewSalary] = useState(0);
+
 
   const [employeeList, setEmployeeList] = useState([]);
 
   
   const getEmployees = () => {
-    Axios.get("https://localhost:3001/employees").then((response) => {
+    Axios.get("http://localhost:3001/employees").then((response) => {
       setEmployeeList(response.data);
     });
   };
 
 
   const addEmployee = () => {
-    Axios.post("https://localhost:3001/employees/add", {
+    Axios.post("http://localhost:3001/add", {
       name: name,
       salary: salary,
-      position: position,
+      job_title: job_title,
       email: email,
-      phoneNo: phoneNo
+      phone: phoneNo
     }).then(() => {
       setEmployeeList([
         ...employeeList,
         {
           name: name,
           salary: salary,
-          position: position,
+          job_title: job_title,
           email: email,
-          phoneNo: phoneNo
+          phone: phoneNo
         },
       ]);
     });
   };
 
+
+  const deleteEmployee = (id) => {
+    Axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
+      setEmployeeList(
+        employeeList.filter((val) => {
+          return val.emp_id != id;
+        })
+      );
+    });
+  };
+
+  const updateEmployeeSalary = (id) => {
+    Axios.put("http://localhost:3001/update", { salary: newSalary, id: id }).then(
+      (response) => {
+        setEmployeeList(
+          employeeList.map((val) => {
+            return val.emp_id == id
+              ? {
+                  emp_id: val.emp_id,
+                  name: val.name,
+                  country: val.country,
+                  age: val.age,
+                  position: val.position,
+                  salary: newSalary,
+                }
+              : val;
+          })
+        );
+      }
+    );
+  };
 
   return (
     <div className="App">
@@ -70,11 +103,11 @@ function App() {
           }
         }
         />
-        <label>Position:</label>
+        <label>job_title:</label>
         <input
           type="text"
           onChange={(event) => {
-            setPosition(event.target.value);
+            setjob_title(event.target.value);
           }}
         />
         <label>Phone Number:</label>
@@ -95,23 +128,24 @@ function App() {
           return (
             <div className="employee">
               <div>
+                <h3>Id: {val.emp_id}</h3>
                 <h3>Name: {val.name}</h3>
-                <h3>Age: {val.age}</h3>
-                <h3>Country: {val.country}</h3>
-                <h3>Position: {val.position}</h3>
-                <h3>Wage: {val.wage}</h3>
+                <h3>Phone No.: {val.phone}</h3>
+                <h3>Email: {val.email}</h3>
+                <h3>Job Title: {val.job_title}</h3>
+                <h3>Salary: {val.salary}</h3>
               </div>
               <div>
                 <input
-                  type="text"
-                  placeholder="2000..."
+                  type="number"
+                  placeholder="Change Salary Here"
                   onChange={(event) => {
-                    //setNewWage(event.target.value);
+                    setNewSalary(event.target.value);
                   }}
                 />
                 <button
                   onClick={() => {
-                    //updateEmployeeWage(val.id);
+                    updateEmployeeSalary(val.emp_id);
                   }}
                 >
                   {" "}
@@ -120,7 +154,7 @@ function App() {
 
                 <button
                   onClick={() => {
-                    //deleteEmployee(val.id);
+                    deleteEmployee(val.emp_id);
                   }}
                 >
                   Delete

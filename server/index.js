@@ -1,149 +1,81 @@
-const express = require('express')
-const bodyParser = require('body-parser')
+
+const express = require("express");
+const app = express();
 const mysql = require("mysql");
-const server = express();
+const cors = require("cors");
 
-var cors = require('cors')
-server.use(cors())
-server.use(bodyParser.json());
+app.use(cors());
+app.use(express.json());
 
-let sql = `CALL filterTodo(?)`;
- 
- 
-//Establish the database connection
+//Stored Procedures
+var addEmpCall = `CALL add_employee`
+var deleteEmpCall = `CALL delete_employee`
+var editEmpCall = `CALL edit_employee`
+
+
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "password",
-    database: "empmanagementsyst",
+  user: "root",
+  host: "localhost",
+  password: "password",
+  database: "empmanagementsyst",
+});
+
+app.post("/add", (req, res) => {
+  const name = req.body.name;
+  const salary = req.body.salary;
+  const job_title = req.body.job_title;
+  const email = req.body.email;
+  const phone = req.body.phone;
+
+    
 });
 
 
-db.connect(function (error) {
-    if (error) {
-      console.log("Error Connecting to DB");
+
+
+//Get Method
+app.get("/employees", (req, res) => {
+  db.query("SELECT * FROM csv_employee", (err, result) => {
+    if (err) {
+      console.log(err);
     } else {
-      console.log("successfully Connected to DB");
+      res.send(result);
     }
+  });
 });
- 
-//Establish the Port
-server.listen(3001,function check(error) {
-    if (error)
-    {
-        console.log("Error");
+
+//Update Method
+app.put("/update", (req, res) => {
+  const id = req.body.id;
+  const salary = req.body.salary;
+  db.query(
+    "UPDATE csv_employee SET salary = ? WHERE emp_id = ?",
+    [salary, id],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(result);
+      }
     }
- 
-    else
-    {
-        console.log("Started on 3001");
+  );
+});
+
+//Delete Method
+app.delete("/delete/:id", (req, res) => {
+  const id = req.params.id;
+  db.query("DELETE FROM csv_employee WHERE emp_id = ?", id, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
     }
-});
- 
-//Create the Records
-server.post("/employee/add", (req, res) => {
-    let details = {
-      name: req.body.name,
-      phone: req.body.phone,
-      email: req.body.email,
-      salary: req.body.salary,
-      title: req.body.title,
-      // mngr_id: req.body.mngr_id,
-      // empid:req.body.emp_id
-    };
-      let sql = "INSERT INTO employee SET ?";
-    db.query(sql, details, (error) => {
-      if (error) {
-        res.send({ status: false, message: "Employee created Failed" });
-      } else {
-        res.send({ status: true, message: "Employee created successfully" });
-      }
-    });
   });
-
-
-//view the Records
-server.get("/employee", (req, res) => {
-    var sql = "SELECT * FROM Employee";
-    db.query(sql, function (error, result) {
-      if (error) {
-        console.log("Error Connecting to DB");
-      } else {
-        res.send({ status: true, data: result });
-      }
-    });
-  });
- 
- 
-//Search the Records
-server.get("/api/employee/:id", (req, res) => {
-    var empolyeeid = req.params.emp_id;
-    var sql = "SELECT name, phone, email, emp_id, department_id, job_title where emp_id=" +empolyeeid
-    db.query(sql, function (error, result) {
-      if (error) {
-        console.log("Error Connecting to DB");
-      } else {
-        res.send({ status: true, data: result });
-      }
-    });
 });
 
-server.get("/api/employee/:managerid", (req, res) => {
-    var managerid = req.params.mngr_id;
-    var sql = "SELECT * FROM employee WHERE manager_id=" + managerid;
-    db.query(sql, function (error, result) {
-      if (error) {
-        console.log("Error Connecting to DB");
-      } else {
-        res.send({ status: true, data: result });
-      }
-    });
-});
- 
-
-server.get("/api/employee/:deptartmentid", (req, res) => {
-    var managerid = req.params.mngr_id;
-    var sql = "SELECT * FROM employee WHERE manager_id=" + managerid;
-    db.query(sql, function (error, result) {
-      if (error) {
-        console.log("Error Connecting to DB");
-      } else {
-        res.send({ status: true, data: result });
-      }
-    });
-});
- 
-
-//Update the Records
-server.put("/api/employee/update/:id", (req, res) => {
-    let sql =
-      "UPDATE employee SET name='" +
-      req.body.name +
-      "', course='" +
-      req.body.course +
-      "',fee='" +
-      req.body.fee +
-      "'  WHERE id=" +
-      req.params.id;
-
-    let a = db.query(sql, (error, result) => {
-      if (error) {
-        res.send({ status: false, message: "Employee Updated Failed" });
-      } else {
-        res.send({ status: true, message: "Employee Updated successfully" });
-      }
-    });
-  });
+app.listen(3001, () => {
+  console.log("Yey, your server is running on port 3001");
+})
 
 
-//Delete the Records
-server.delete("/api/employee/delete/:id", (req, res) => {
-    let sql = "DELETE FROM employee WHERE id=" + req.params.empid + "";
-    let query = db.query(sql, (error) => {
-      if (error) {
-        res.send({ status: false, message: "Employee Deleted Failed" });
-      } else {
-        res.send({ status: true, message: "Employee Deleted successfully" });
-      }
-    });
-});
+
